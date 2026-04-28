@@ -13,7 +13,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingJoinRouteImport } from './routes/onboarding.join'
 import { Route as OnboardingCreateRouteImport } from './routes/onboarding.create'
+import { Route as AppWishlistRouteImport } from './routes/app.wishlist'
+import { Route as AppRestaurantsRouteImport } from './routes/app.restaurants'
 import { Route as AppHomeRouteImport } from './routes/app.home'
+import { Route as AppFriendsRouteImport } from './routes/app.friends'
+import { Route as AppDiaryRouteImport } from './routes/app.diary'
+import { Route as AppCalendarRouteImport } from './routes/app.calendar'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -35,23 +40,58 @@ const OnboardingCreateRoute = OnboardingCreateRouteImport.update({
   path: '/onboarding/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWishlistRoute = AppWishlistRouteImport.update({
+  id: '/app/wishlist',
+  path: '/app/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRestaurantsRoute = AppRestaurantsRouteImport.update({
+  id: '/app/restaurants',
+  path: '/app/restaurants',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/app/home',
   path: '/app/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppFriendsRoute = AppFriendsRouteImport.update({
+  id: '/app/friends',
+  path: '/app/friends',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppDiaryRoute = AppDiaryRouteImport.update({
+  id: '/app/diary',
+  path: '/app/diary',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppCalendarRoute = AppCalendarRouteImport.update({
+  id: '/app/calendar',
+  path: '/app/calendar',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/calendar': typeof AppCalendarRoute
+  '/app/diary': typeof AppDiaryRoute
+  '/app/friends': typeof AppFriendsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/restaurants': typeof AppRestaurantsRoute
+  '/app/wishlist': typeof AppWishlistRoute
   '/onboarding/create': typeof OnboardingCreateRoute
   '/onboarding/join': typeof OnboardingJoinRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/calendar': typeof AppCalendarRoute
+  '/app/diary': typeof AppDiaryRoute
+  '/app/friends': typeof AppFriendsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/restaurants': typeof AppRestaurantsRoute
+  '/app/wishlist': typeof AppWishlistRoute
   '/onboarding/create': typeof OnboardingCreateRoute
   '/onboarding/join': typeof OnboardingJoinRoute
 }
@@ -59,7 +99,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/calendar': typeof AppCalendarRoute
+  '/app/diary': typeof AppDiaryRoute
+  '/app/friends': typeof AppFriendsRoute
   '/app/home': typeof AppHomeRoute
+  '/app/restaurants': typeof AppRestaurantsRoute
+  '/app/wishlist': typeof AppWishlistRoute
   '/onboarding/create': typeof OnboardingCreateRoute
   '/onboarding/join': typeof OnboardingJoinRoute
 }
@@ -68,16 +113,36 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/app/calendar'
+    | '/app/diary'
+    | '/app/friends'
     | '/app/home'
+    | '/app/restaurants'
+    | '/app/wishlist'
     | '/onboarding/create'
     | '/onboarding/join'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/app/home' | '/onboarding/create' | '/onboarding/join'
+  to:
+    | '/'
+    | '/auth'
+    | '/app/calendar'
+    | '/app/diary'
+    | '/app/friends'
+    | '/app/home'
+    | '/app/restaurants'
+    | '/app/wishlist'
+    | '/onboarding/create'
+    | '/onboarding/join'
   id:
     | '__root__'
     | '/'
     | '/auth'
+    | '/app/calendar'
+    | '/app/diary'
+    | '/app/friends'
     | '/app/home'
+    | '/app/restaurants'
+    | '/app/wishlist'
     | '/onboarding/create'
     | '/onboarding/join'
   fileRoutesById: FileRoutesById
@@ -85,7 +150,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  AppCalendarRoute: typeof AppCalendarRoute
+  AppDiaryRoute: typeof AppDiaryRoute
+  AppFriendsRoute: typeof AppFriendsRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppRestaurantsRoute: typeof AppRestaurantsRoute
+  AppWishlistRoute: typeof AppWishlistRoute
   OnboardingCreateRoute: typeof OnboardingCreateRoute
   OnboardingJoinRoute: typeof OnboardingJoinRoute
 }
@@ -120,11 +190,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/wishlist': {
+      id: '/app/wishlist'
+      path: '/app/wishlist'
+      fullPath: '/app/wishlist'
+      preLoaderRoute: typeof AppWishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/restaurants': {
+      id: '/app/restaurants'
+      path: '/app/restaurants'
+      fullPath: '/app/restaurants'
+      preLoaderRoute: typeof AppRestaurantsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/home': {
       id: '/app/home'
       path: '/app/home'
       fullPath: '/app/home'
       preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/friends': {
+      id: '/app/friends'
+      path: '/app/friends'
+      fullPath: '/app/friends'
+      preLoaderRoute: typeof AppFriendsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/diary': {
+      id: '/app/diary'
+      path: '/app/diary'
+      fullPath: '/app/diary'
+      preLoaderRoute: typeof AppDiaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/calendar': {
+      id: '/app/calendar'
+      path: '/app/calendar'
+      fullPath: '/app/calendar'
+      preLoaderRoute: typeof AppCalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -133,7 +238,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  AppCalendarRoute: AppCalendarRoute,
+  AppDiaryRoute: AppDiaryRoute,
+  AppFriendsRoute: AppFriendsRoute,
   AppHomeRoute: AppHomeRoute,
+  AppRestaurantsRoute: AppRestaurantsRoute,
+  AppWishlistRoute: AppWishlistRoute,
   OnboardingCreateRoute: OnboardingCreateRoute,
   OnboardingJoinRoute: OnboardingJoinRoute,
 }
