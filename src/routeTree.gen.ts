@@ -9,38 +9,96 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnboardingJoinRouteImport } from './routes/onboarding.join'
+import { Route as OnboardingCreateRouteImport } from './routes/onboarding.create'
+import { Route as AppHomeRouteImport } from './routes/app.home'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingJoinRoute = OnboardingJoinRouteImport.update({
+  id: '/onboarding/join',
+  path: '/onboarding/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingCreateRoute = OnboardingCreateRouteImport.update({
+  id: '/onboarding/create',
+  path: '/onboarding/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/app/home',
+  path: '/app/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app/home': typeof AppHomeRoute
+  '/onboarding/create': typeof OnboardingCreateRoute
+  '/onboarding/join': typeof OnboardingJoinRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app/home': typeof AppHomeRoute
+  '/onboarding/create': typeof OnboardingCreateRoute
+  '/onboarding/join': typeof OnboardingJoinRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app/home': typeof AppHomeRoute
+  '/onboarding/create': typeof OnboardingCreateRoute
+  '/onboarding/join': typeof OnboardingJoinRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/app/home'
+    | '/onboarding/create'
+    | '/onboarding/join'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/auth' | '/app/home' | '/onboarding/create' | '/onboarding/join'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/app/home'
+    | '/onboarding/create'
+    | '/onboarding/join'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  AppHomeRoute: typeof AppHomeRoute
+  OnboardingCreateRoute: typeof OnboardingCreateRoute
+  OnboardingJoinRoute: typeof OnboardingJoinRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,21 +106,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding/join': {
+      id: '/onboarding/join'
+      path: '/onboarding/join'
+      fullPath: '/onboarding/join'
+      preLoaderRoute: typeof OnboardingJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/create': {
+      id: '/onboarding/create'
+      path: '/onboarding/create'
+      fullPath: '/onboarding/create'
+      preLoaderRoute: typeof OnboardingCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/home': {
+      id: '/app/home'
+      path: '/app/home'
+      fullPath: '/app/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  AppHomeRoute: AppHomeRoute,
+  OnboardingCreateRoute: OnboardingCreateRoute,
+  OnboardingJoinRoute: OnboardingJoinRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
