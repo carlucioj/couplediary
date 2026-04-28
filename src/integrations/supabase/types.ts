@@ -14,13 +14,454 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          activity_type: string
+          actor_id: string
+          couple_id: string
+          created_at: string
+          id: string
+          payload: Json
+        }
+        Insert: {
+          activity_type: string
+          actor_id: string
+          couple_id: string
+          created_at?: string
+          id?: string
+          payload?: Json
+        }
+        Update: {
+          activity_type?: string
+          actor_id?: string
+          couple_id?: string
+          created_at?: string
+          id?: string
+          payload?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couple_friendships: {
+        Row: {
+          couple_a: string
+          couple_b: string
+          created_at: string
+          id: string
+          requested_by: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          couple_a: string
+          couple_b: string
+          created_at?: string
+          id?: string
+          requested_by: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          couple_a?: string
+          couple_b?: string
+          created_at?: string
+          id?: string
+          requested_by?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_friendships_couple_a_fkey"
+            columns: ["couple_a"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "couple_friendships_couple_b_fkey"
+            columns: ["couple_b"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couple_members: {
+        Row: {
+          couple_id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          couple_id: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          couple_id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "couple_members_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      couples: {
+        Row: {
+          anniversary_date: string
+          created_at: string
+          created_by: string
+          id: string
+          invite_code: string | null
+          invite_expires_at: string | null
+          is_discoverable: boolean
+          public_avatar_url: string | null
+          public_city: string | null
+          public_handle: string | null
+          updated_at: string
+        }
+        Insert: {
+          anniversary_date: string
+          created_at?: string
+          created_by: string
+          id?: string
+          invite_code?: string | null
+          invite_expires_at?: string | null
+          is_discoverable?: boolean
+          public_avatar_url?: string | null
+          public_city?: string | null
+          public_handle?: string | null
+          updated_at?: string
+        }
+        Update: {
+          anniversary_date?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          invite_code?: string | null
+          invite_expires_at?: string | null
+          is_discoverable?: boolean
+          public_avatar_url?: string | null
+          public_city?: string | null
+          public_handle?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      day_memories: {
+        Row: {
+          couple_id: string
+          created_at: string
+          created_by: string
+          id: string
+          is_shared: boolean
+          memory_date: string
+          mood: string | null
+          note: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          is_shared?: boolean
+          memory_date: string
+          mood?: string | null
+          note?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_shared?: boolean
+          memory_date?: string
+          mood?: string | null
+          note?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "day_memories_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          couple_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_at: string | null
+          event_type: string
+          google_event_id: string | null
+          id: string
+          recurrence: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_at?: string | null
+          event_type?: string
+          google_event_id?: string | null
+          id?: string
+          recurrence?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_at?: string | null
+          event_type?: string
+          google_event_id?: string | null
+          id?: string
+          recurrence?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          name: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      restaurants: {
+        Row: {
+          couple_id: string
+          created_at: string
+          created_by: string
+          favorite_dish: string | null
+          id: string
+          image_url: string | null
+          location: string | null
+          name: string
+          notes: string | null
+          rating: number | null
+          status: string
+          updated_at: string
+          visited_at: string | null
+        }
+        Insert: {
+          couple_id: string
+          created_at?: string
+          created_by: string
+          favorite_dish?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          name: string
+          notes?: string | null
+          rating?: number | null
+          status?: string
+          updated_at?: string
+          visited_at?: string | null
+        }
+        Update: {
+          couple_id?: string
+          created_at?: string
+          created_by?: string
+          favorite_dish?: string | null
+          id?: string
+          image_url?: string | null
+          location?: string | null
+          name?: string
+          notes?: string | null
+          rating?: number | null
+          status?: string
+          updated_at?: string
+          visited_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurants_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shared_posts: {
+        Row: {
+          caption: string
+          couple_id: string
+          created_at: string
+          created_by: string
+          id: string
+          image_url: string | null
+          kind: string
+          ref_id: string | null
+        }
+        Insert: {
+          caption: string
+          couple_id: string
+          created_at?: string
+          created_by: string
+          id?: string
+          image_url?: string | null
+          kind: string
+          ref_id?: string | null
+        }
+        Update: {
+          caption?: string
+          couple_id?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          image_url?: string | null
+          kind?: string
+          ref_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_posts_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wishlist_items: {
+        Row: {
+          brand: string | null
+          couple_id: string
+          created_at: string
+          created_by: string
+          currency: string | null
+          description: string | null
+          for_whom: string
+          id: string
+          image_url: string | null
+          price: number | null
+          status: string
+          status_date: string | null
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          brand?: string | null
+          couple_id: string
+          created_at?: string
+          created_by: string
+          currency?: string | null
+          description?: string | null
+          for_whom?: string
+          id?: string
+          image_url?: string | null
+          price?: number | null
+          status?: string
+          status_date?: string | null
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          brand?: string | null
+          couple_id?: string
+          created_at?: string
+          created_by?: string
+          currency?: string | null
+          description?: string | null
+          for_whom?: string
+          id?: string
+          image_url?: string | null
+          price?: number | null
+          status?: string
+          status_date?: string | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_items_couple_id_fkey"
+            columns: ["couple_id"]
+            isOneToOne: false
+            referencedRelation: "couples"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      are_couples_friends: {
+        Args: { _a: string; _b: string }
+        Returns: boolean
+      }
+      get_user_couple_id: { Args: { _user_id: string }; Returns: string }
+      is_couple_member: {
+        Args: { _couple_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
