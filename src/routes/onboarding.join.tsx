@@ -50,32 +50,15 @@ function JoinCouplePage() {
     setSubmitting(true);
     try {
       const upper = parsed.data.code.toUpperCase();
-
-      // Find couple by code (RLS: only discoverable couples are public via SELECT,
-      // so we go through a lookup that respects current policies — couples by code
-      // are visible to authenticated users via the discoverable policy when needed.
-      // Here we use an RPC-less approach: try insert and rely on error.
-      // First, we try to read by invite_code under the assumption it's our own membership context.
-      const { data: found, error: findErr } = await supabase
-        .from("couples")
-        .select("id, invite_expires_at")
-        .eq("invite_code", upper)
-        .maybeSingle();
-
-      if (findErr) throw findErr;
-      if (!found) {
-        toast.error("Código inválido. Confirme com seu amor.");
+      const { error: rpcErr } = await supabase.rpc("join_couple_by_code", { _code: upper });
+      if (rpcErr) {
+        const m = rpcErr.message || "";
+        if (m.includes("invalid_code")) toast.error("Código inválido. Confirme com seu amor.");
+        else if (m.includes("code_expired")) toast.error("Esse código expirou. Peça um novo.");
+        else if (m.includes("already_in_couple")) toast.error("Você já está em um casal.");
+        else toast.error(m);
         return;
       }
-      if (found.invite_expires_at && new Date(found.invite_expires_at).getTime() < Date.now()) {
-        toast.error("Esse código expirou. Peça um novo.");
-        return;
-      }
-
-      const { error: mErr } = await supabase
-        .from("couple_members")
-        .insert({ couple_id: found.id, user_id: user.id });
-      if (mErr) throw mErr;
 
       toast.success("Vocês estão conectados 💞");
       await refresh();
