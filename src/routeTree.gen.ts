@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnboardingJoinRouteImport } from './routes/onboarding.join'
+import { Route as OnboardingCreateRouteImport } from './routes/onboarding.create'
 import { Route as AppHomeRouteImport } from './routes/app.home'
 
 const AuthRoute = AuthRouteImport.update({
@@ -23,6 +25,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingJoinRoute = OnboardingJoinRouteImport.update({
+  id: '/onboarding/join',
+  path: '/onboarding/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingCreateRoute = OnboardingCreateRouteImport.update({
+  id: '/onboarding/create',
+  path: '/onboarding/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/app/home',
   path: '/app/home',
@@ -33,30 +45,49 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/home': typeof AppHomeRoute
+  '/onboarding/create': typeof OnboardingCreateRoute
+  '/onboarding/join': typeof OnboardingJoinRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/home': typeof AppHomeRoute
+  '/onboarding/create': typeof OnboardingCreateRoute
+  '/onboarding/join': typeof OnboardingJoinRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/home': typeof AppHomeRoute
+  '/onboarding/create': typeof OnboardingCreateRoute
+  '/onboarding/join': typeof OnboardingJoinRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/app/home'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/app/home'
+    | '/onboarding/create'
+    | '/onboarding/join'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/app/home'
-  id: '__root__' | '/' | '/auth' | '/app/home'
+  to: '/' | '/auth' | '/app/home' | '/onboarding/create' | '/onboarding/join'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/app/home'
+    | '/onboarding/create'
+    | '/onboarding/join'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   AppHomeRoute: typeof AppHomeRoute
+  OnboardingCreateRoute: typeof OnboardingCreateRoute
+  OnboardingJoinRoute: typeof OnboardingJoinRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,6 +106,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding/join': {
+      id: '/onboarding/join'
+      path: '/onboarding/join'
+      fullPath: '/onboarding/join'
+      preLoaderRoute: typeof OnboardingJoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/create': {
+      id: '/onboarding/create'
+      path: '/onboarding/create'
+      fullPath: '/onboarding/create'
+      preLoaderRoute: typeof OnboardingCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/home': {
       id: '/app/home'
       path: '/app/home'
@@ -89,6 +134,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   AppHomeRoute: AppHomeRoute,
+  OnboardingCreateRoute: OnboardingCreateRoute,
+  OnboardingJoinRoute: OnboardingJoinRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
