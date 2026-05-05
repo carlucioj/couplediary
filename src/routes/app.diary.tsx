@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useCouple } from "@/lib/use-couple";
 import { logActivity, notifyPartnerWhatsApp } from "@/lib/notify";
+import { DEMO_MEMORIES } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/app/diary")({
   head: () => ({ meta: [{ title: "Diário do dia — Nosso Diário" }] }),
@@ -34,7 +35,7 @@ type Memory = {
 };
 
 function DiaryPage() {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
   const { couple, partner } = useCouple();
   const [items, setItems] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +48,11 @@ function DiaryPage() {
   const [addToCalendar, setAddToCalendar] = useState(true);
 
   async function load() {
+    if (isDemo) {
+      setItems(DEMO_MEMORIES as Memory[]);
+      setLoading(false);
+      return;
+    }
     if (!couple) return;
     setLoading(true);
     const { data, error } = await supabase
@@ -67,8 +73,22 @@ function DiaryPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!couple || !user) return;
     if (!title.trim()) return toast.error("Dê um título à memória");
+    if (isDemo) {
+      const newMem: Memory = {
+        id: `mem-${Date.now()}`,
+        memory_date: date,
+        title: title.trim(),
+        note: note.trim() || null,
+        mood,
+        created_at: new Date().toISOString(),
+      };
+      setItems((s) => [newMem, ...s]);
+      toast.success("Memória registrada 💞");
+      setOpen(false); setTitle(""); setNote(""); setMood("💖");
+      return;
+    }
+    if (!couple || !user) return;
     setSubmitting(true);
     try {
       const { data, error } = await supabase
@@ -118,6 +138,10 @@ function DiaryPage() {
   }
 
   async function handleDelete(id: string) {
+    if (isDemo) {
+      setItems((s) => s.filter((m) => m.id !== id));
+      return;
+    }
     const { error } = await supabase.from("day_memories").delete().eq("id", id);
     if (error) return toast.error(error.message);
     setItems((s) => s.filter((m) => m.id !== id));
