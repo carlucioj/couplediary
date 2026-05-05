@@ -1,6 +1,6 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Heart } from "lucide-react";
+import { Heart, FlaskConical } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { enableDemoMode } from "@/lib/demo-data";
 
 const searchSchema = z.object({
   mode: z.enum(["login", "signup"]).optional(),
@@ -21,8 +22,13 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Entre ou crie sua conta no Nosso Diário." },
     ],
   }),
-  component: AuthPage,
+  component: AuthLayout,
 });
+
+// Layout: renderiza a página de auth OU rotas filhas (ex: /auth/callback)
+function AuthLayout() {
+  return <Outlet />;
+}
 
 const credSchema = z.object({
   email: z.string().trim().email("E-mail inválido").max(255),
@@ -33,7 +39,7 @@ const signupSchema = credSchema.extend({
   name: z.string().trim().min(1, "Diga seu nome").max(60),
 });
 
-function AuthPage() {
+export function AuthPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { user, loading } = useAuth();
@@ -54,6 +60,12 @@ function AuthPage() {
     if (search.mode) setMode(search.mode);
   }, [search.mode]);
 
+  function handleDemo() {
+    enableDemoMode();
+    // Força reload para o AuthProvider detectar o modo demo
+    window.location.href = "/app/home";
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
@@ -68,7 +80,7 @@ function AuthPage() {
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/app/home`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
             data: { name: parsed.data.name },
           },
         });
@@ -102,6 +114,24 @@ function AuthPage() {
           <Heart className="h-6 w-6 fill-primary text-primary" />
           <span className="text-lg font-semibold">Nosso Diário</span>
         </Link>
+
+        {/* Banner modo demo */}
+        <div className="mb-4 rounded-xl border border-dashed border-primary/40 bg-blush/40 p-4">
+          <p className="text-sm font-medium text-foreground">Quer explorar sem criar conta?</p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            O modo demo carrega dados de exemplo em todas as telas — diário, calendário, restaurantes e mais.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-3 gap-2 border-primary/40 text-primary hover:bg-blush"
+            onClick={handleDemo}
+          >
+            <FlaskConical className="h-4 w-4" />
+            Entrar no modo demo
+          </Button>
+        </div>
 
         <div className="rounded-2xl border bg-card p-6 shadow-[var(--shadow-card)]">
           <div className="mb-5 flex rounded-lg bg-muted p-1 text-sm">

@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useCouple } from "@/lib/use-couple";
 import { useAuth } from "@/lib/auth";
+import { DEMO_FRIENDS, DEMO_FRIEND_COUPLES } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/app/friends")({
   head: () => ({ meta: [{ title: "Casais conectados — Nosso Diário" }] }),
@@ -36,7 +37,7 @@ type Friendship = {
 };
 
 function FriendsPage() {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
   const { couple, refresh } = useCouple();
   const [handle, setHandle] = useState("");
   const [city, setCity] = useState("");
@@ -56,10 +57,16 @@ function FriendsPage() {
   }, [couple]);
 
   async function loadFriendships() {
+    if (isDemo) {
+      setFriendships(DEMO_FRIENDS as Friendship[]);
+      setFriendCouples(DEMO_FRIEND_COUPLES);
+      return;
+    }
     if (!couple) return;
     const { data } = await supabase
       .from("couple_friendships")
-      .select("id, couple_a, couple_b, status, requested_by");
+      .select("id, couple_a, couple_b, status, requested_by")
+      .or(`couple_a.eq.${couple.id},couple_b.eq.${couple.id}`);
     const list = (data ?? []) as Friendship[];
     setFriendships(list);
 

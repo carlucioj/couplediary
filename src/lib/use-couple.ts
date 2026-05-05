@@ -1,6 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./auth";
+import {
+  DEMO_COUPLE,
+  DEMO_ME,
+  DEMO_PARTNER,
+} from "./demo-data";
 
 export type Couple = {
   id: string;
@@ -22,13 +27,22 @@ export type Profile = {
 };
 
 export function useCouple() {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
   const [couple, setCouple] = useState<Couple | null>(null);
   const [partner, setPartner] = useState<Profile | null>(null);
   const [me, setMe] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
+    // Modo demo: retorna dados mockados
+    if (isDemo) {
+      setCouple(DEMO_COUPLE);
+      setMe(DEMO_ME);
+      setPartner(DEMO_PARTNER);
+      setLoading(false);
+      return;
+    }
+
     if (!user) {
       setCouple(null);
       setPartner(null);
@@ -39,7 +53,6 @@ export function useCouple() {
 
     setLoading(true);
 
-    // Fetch user's couple via couple_members
     const { data: membership } = await supabase
       .from("couple_members")
       .select("couple_id")
@@ -75,7 +88,7 @@ export function useCouple() {
     setMe(profiles.find((p) => p.user_id === user.id) ?? null);
     setPartner(profiles.find((p) => p.user_id !== user.id) ?? null);
     setLoading(false);
-  }, [user]);
+  }, [user, isDemo]);
 
   useEffect(() => {
     refresh();

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
-import { Heart, Home, BookHeart, Calendar, Utensils, Gift, Users, LogOut } from "lucide-react";
+import { Heart, Home, BookHeart, Calendar, Utensils, Gift, Users, LogOut, FlaskConical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { useCouple } from "@/lib/use-couple";
@@ -17,7 +17,7 @@ const NAV = [
 ] as const;
 
 export function AppShell({ children, requireCouple = true }: { children: ReactNode; requireCouple?: boolean }) {
-  const { user, loading: authLoading, signOut } = useAuth();
+  const { user, loading: authLoading, signOut, isDemo } = useAuth();
   const { couple, loading: coupleLoading } = useCouple();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,6 +40,21 @@ export function AppShell({ children, requireCouple = true }: { children: ReactNo
 
   return (
     <div className="min-h-screen bg-[var(--gradient-soft)] pb-24 md:pb-10">
+      {/* Banner modo demo */}
+      {isDemo && (
+        <div className="flex items-center justify-between gap-2 bg-primary/10 px-4 py-2 text-xs text-primary">
+          <span className="flex items-center gap-1.5">
+            <FlaskConical className="h-3.5 w-3.5" />
+            Modo demo — dados de exemplo, nada é salvo
+          </span>
+          <button
+            onClick={() => signOut()}
+            className="underline underline-offset-2 hover:no-underline"
+          >
+            Sair do demo
+          </button>
+        </div>
+      )}
       <header className="sticky top-0 z-30 border-b bg-background/80 backdrop-blur">
         <div className="container mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <Link to="/app/home" className="flex items-center gap-2">

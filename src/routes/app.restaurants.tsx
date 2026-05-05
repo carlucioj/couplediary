@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useCouple } from "@/lib/use-couple";
 import { logActivity } from "@/lib/notify";
+import { DEMO_RESTAURANTS } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/app/restaurants")({
   head: () => ({ meta: [{ title: "Restaurantes — Nosso Diário" }] }),
@@ -35,7 +36,7 @@ type Restaurant = {
 };
 
 function RestaurantsPage() {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
   const { couple } = useCouple();
   const [items, setItems] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +52,11 @@ function RestaurantsPage() {
   const [visitedAt, setVisitedAt] = useState(new Date().toISOString().slice(0, 10));
 
   async function load() {
+    if (isDemo) {
+      setItems(DEMO_RESTAURANTS as Restaurant[]);
+      setLoading(false);
+      return;
+    }
     if (!couple) return;
     setLoading(true);
     const { data, error } = await supabase
@@ -75,8 +81,24 @@ function RestaurantsPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!couple || !user) return;
     if (!name.trim()) return toast.error("Nome do restaurante é obrigatório");
+    if (isDemo) {
+      const newR: Restaurant = {
+        id: `rest-${Date.now()}`,
+        status,
+        name: name.trim(),
+        location: location.trim() || null,
+        rating: status === "visited" ? rating : null,
+        notes: notes.trim() || null,
+        favorite_dish: status === "visited" ? (favoriteDish.trim() || null) : null,
+        visited_at: status === "visited" ? visitedAt : null,
+      };
+      setItems((s) => [newR, ...s]);
+      toast.success(status === "visited" ? "Restaurante adicionado 🍷" : "Adicionado aos desejos");
+      setOpen(false); reset();
+      return;
+    }
+    if (!couple || !user) return;
     setSubmitting(true);
     try {
       const { error } = await supabase.from("restaurants").insert({
@@ -106,6 +128,11 @@ function RestaurantsPage() {
   }
 
   async function markVisited(id: string) {
+    if (isDemo) {
+      setItems((s) => s.map((r) => r.id === id ? { ...r, status: "visited", visited_at: new Date().toISOString().slice(0, 10) } : r));
+      toast.success("Marcado como visitado!");
+      return;
+    }
     const { error } = await supabase
       .from("restaurants")
       .update({ status: "visited", visited_at: new Date().toISOString().slice(0, 10) })
@@ -116,6 +143,10 @@ function RestaurantsPage() {
   }
 
   async function handleDelete(id: string) {
+    if (isDemo) {
+      setItems((s) => s.filter((r) => r.id !== id));
+      return;
+    }
     const { error } = await supabase.from("restaurants").delete().eq("id", id);
     if (error) return toast.error(error.message);
     setItems((s) => s.filter((r) => r.id !== id));

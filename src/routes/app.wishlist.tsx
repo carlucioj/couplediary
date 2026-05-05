@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useCouple } from "@/lib/use-couple";
 import { logActivity } from "@/lib/notify";
+import { DEMO_WISHLIST } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/app/wishlist")({
   head: () => ({ meta: [{ title: "Lista de desejos — Nosso Diário" }] }),
@@ -36,7 +37,7 @@ type Wish = {
 };
 
 function WishlistPage() {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
   const { couple } = useCouple();
   const [items, setItems] = useState<Wish[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +49,11 @@ function WishlistPage() {
   const [fetching, setFetching] = useState(false);
 
   async function load() {
+    if (isDemo) {
+      setItems(DEMO_WISHLIST as Wish[]);
+      setLoading(false);
+      return;
+    }
     if (!couple) return;
     setLoading(true);
     const { data, error } = await supabase
@@ -89,9 +95,29 @@ function WishlistPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!couple || !user) return;
+    if (!couple && !isDemo) return;
     setSubmitting(true);
     try {
+      if (isDemo) {
+        const finalTitle = title.trim() || url.trim() || "Sem título";
+        const newW: Wish = {
+          id: `wish-${Date.now()}`,
+          title: finalTitle,
+          description: null,
+          url: url.trim() || null,
+          image_url: null,
+          brand: null,
+          price: null,
+          currency: "BRL",
+          status: "wanted",
+          for_whom: forWhom,
+        };
+        setItems((s) => [newW, ...s]);
+        toast.success("Adicionado à lista 🎁");
+        setOpen(false); setUrl(""); setTitle(""); setForWhom("us");
+        return;
+      }
+      if (!user || !couple) return;
       let meta: Partial<Wish> | null = null;
       if (url.trim() && !title.trim()) meta = await fetchMeta();
 
@@ -126,6 +152,11 @@ function WishlistPage() {
   }
 
   async function markPurchased(id: string) {
+    if (isDemo) {
+      setItems((s) => s.map((w) => w.id === id ? { ...w, status: "purchased" } : w));
+      toast.success("Marcado como comprado!");
+      return;
+    }
     const { error } = await supabase
       .from("wishlist_items")
       .update({ status: "purchased", status_date: new Date().toISOString().slice(0, 10) })
@@ -136,6 +167,10 @@ function WishlistPage() {
   }
 
   async function handleDelete(id: string) {
+    if (isDemo) {
+      setItems((s) => s.filter((w) => w.id !== id));
+      return;
+    }
     const { error } = await supabase.from("wishlist_items").delete().eq("id", id);
     if (error) return toast.error(error.message);
     setItems((s) => s.filter((w) => w.id !== id));

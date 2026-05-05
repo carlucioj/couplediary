@@ -11,8 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthIndexRouteImport } from './routes/auth.index'
 import { Route as OnboardingJoinRouteImport } from './routes/onboarding.join'
 import { Route as OnboardingCreateRouteImport } from './routes/onboarding.create'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AppWishlistRouteImport } from './routes/app.wishlist'
 import { Route as AppRestaurantsRouteImport } from './routes/app.restaurants'
 import { Route as AppHomeRouteImport } from './routes/app.home'
@@ -30,6 +32,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthRoute,
+} as any)
 const OnboardingJoinRoute = OnboardingJoinRouteImport.update({
   id: '/onboarding/join',
   path: '/onboarding/join',
@@ -39,6 +46,11 @@ const OnboardingCreateRoute = OnboardingCreateRouteImport.update({
   id: '/onboarding/create',
   path: '/onboarding/create',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AppWishlistRoute = AppWishlistRouteImport.update({
   id: '/app/wishlist',
@@ -73,40 +85,45 @@ const AppCalendarRoute = AppCalendarRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/app/calendar': typeof AppCalendarRoute
   '/app/diary': typeof AppDiaryRoute
   '/app/friends': typeof AppFriendsRoute
   '/app/home': typeof AppHomeRoute
   '/app/restaurants': typeof AppRestaurantsRoute
   '/app/wishlist': typeof AppWishlistRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/onboarding/create': typeof OnboardingCreateRoute
   '/onboarding/join': typeof OnboardingJoinRoute
+  '/auth/': typeof AuthIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/app/calendar': typeof AppCalendarRoute
   '/app/diary': typeof AppDiaryRoute
   '/app/friends': typeof AppFriendsRoute
   '/app/home': typeof AppHomeRoute
   '/app/restaurants': typeof AppRestaurantsRoute
   '/app/wishlist': typeof AppWishlistRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/onboarding/create': typeof OnboardingCreateRoute
   '/onboarding/join': typeof OnboardingJoinRoute
+  '/auth': typeof AuthIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/app/calendar': typeof AppCalendarRoute
   '/app/diary': typeof AppDiaryRoute
   '/app/friends': typeof AppFriendsRoute
   '/app/home': typeof AppHomeRoute
   '/app/restaurants': typeof AppRestaurantsRoute
   '/app/wishlist': typeof AppWishlistRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/onboarding/create': typeof OnboardingCreateRoute
   '/onboarding/join': typeof OnboardingJoinRoute
+  '/auth/': typeof AuthIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -119,20 +136,23 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/restaurants'
     | '/app/wishlist'
+    | '/auth/callback'
     | '/onboarding/create'
     | '/onboarding/join'
+    | '/auth/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/auth'
     | '/app/calendar'
     | '/app/diary'
     | '/app/friends'
     | '/app/home'
     | '/app/restaurants'
     | '/app/wishlist'
+    | '/auth/callback'
     | '/onboarding/create'
     | '/onboarding/join'
+    | '/auth'
   id:
     | '__root__'
     | '/'
@@ -143,13 +163,15 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/restaurants'
     | '/app/wishlist'
+    | '/auth/callback'
     | '/onboarding/create'
     | '/onboarding/join'
+    | '/auth/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   AppCalendarRoute: typeof AppCalendarRoute
   AppDiaryRoute: typeof AppDiaryRoute
   AppFriendsRoute: typeof AppFriendsRoute
@@ -176,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/': {
+      id: '/auth/'
+      path: '/'
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/onboarding/join': {
       id: '/onboarding/join'
       path: '/onboarding/join'
@@ -189,6 +218,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/onboarding/create'
       preLoaderRoute: typeof OnboardingCreateRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/app/wishlist': {
       id: '/app/wishlist'
@@ -235,9 +271,21 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthIndexRoute: typeof AuthIndexRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthIndexRoute: AuthIndexRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   AppCalendarRoute: AppCalendarRoute,
   AppDiaryRoute: AppDiaryRoute,
   AppFriendsRoute: AppFriendsRoute,
@@ -250,3 +298,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
